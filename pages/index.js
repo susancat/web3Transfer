@@ -1,8 +1,12 @@
+import { useState, useEffect } from 'react';
+import Web3 from 'web3';
+
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Transfer from '../components/transactionUpdater/Transfer'
-export default function Home() {
+export default function Home(props) {
+  console.log(props.web3)
   return (
     <div className={styles.container}>
       <Head>

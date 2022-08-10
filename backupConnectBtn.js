@@ -7,27 +7,23 @@ import { Button, ButtonGroup } from "react-bootstrap";
 const ConnectBtn = () => {
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState(0);
-
+  const [isConnected, setIsConnected] = useState(false);
   useEffect(() => {
     detectWeb3();
   })
-  //---------check if there's web3 connection--------
+//check if there's web3 connection
   const detectWeb3 = async () => {
     let provider;
     if(window.ethereum) {
       provider = window.ethereum;
     } else if(window.web3) {
       provider = window.web3.currentProvider;
-    } else { 
-      console.log("Please use Metamask to login")
-    };
+    }
     const web3 = new Web3(provider);
     const accounts = await web3.eth.getAccounts();
     setAccount(accounts[0]);
     await getBalance(web3);
   }
-
-  //------if no web3 connection, connect--------
   const getWeb3Modal = async() => {
     const providerOptions = {
       /* options are for wallet other than metamask setting */
@@ -47,7 +43,6 @@ const ConnectBtn = () => {
     const balance = await web3.utils.fromWei(balInWei);
     setBalance(parseFloat(balance).toFixed(5));
   }
-
   const connect = async () => {
     const web3Modal = await getWeb3Modal();
     const provider = await web3Modal
