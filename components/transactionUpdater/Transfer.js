@@ -4,15 +4,14 @@ import { Row, Col, Button, Form, Card } from 'react-bootstrap';
 function Transfer(props) {  
     const [recipient, setRecipient] = useState("");
     const [amount, setAmount] = useState(0);
+    const { web3, account, balance } = props;
 //two methods for transfering, one is writing a simple ABI and connect contract
 //another is writing a transaction object for transfering
-    const transfer = async () => {
-        const { web3 } = props;
-        const accounts = await web3.eth.getAccounts();
+    const transfer = async (recipient, amount) => {
         const amountInWei = await web3.utils.toWei(amount, 'ether');
         await web3.eth.sendTransaction({
-            from: accounts[0],
-            to: recipient,
+            from: account,
+            to: recipient,//0xc28b02f9316E3D9c0BF7cfE14dbaBC6D67230E78
             value: amountInWei
         }, (err, res) => {
             err ? console.log(err) : console.log(res);
@@ -38,25 +37,25 @@ function Transfer(props) {
 
                     <Form.Group className="mb-3 mt-3" controlId="">
                         <Form.Control 
-                            type="number" 
+                            type="text" 
                             placeholder="Amount" 
                             style={{height: '3rem'}} 
                             onChange={event => setAmount(Number(event.target.value))}
                             required
                         />
                         <Form.Text className="text-muted">
-                        <h6 className='mt-2 d-flex justify-content-end'>MAX: {props.balance}&nbsp;<i className="fa-brands fa-ethereum"></i></h6>
+                        <h6 className='mt-2 d-flex justify-content-end'>MAX: {balance}&nbsp;<i className="fa-brands fa-ethereum"></i></h6>
                     </Form.Text>
                     </Form.Group>
                     {
-                        amount <= props.balance ?
+                        recipient && amount && amount <= balance ?
                         <Button 
                             variant="primary" 
                             size="lg" 
                             type="Send" 
                             className="mb-2" 
                             style={{width:"100%", borderRadius:'15px'}} 
-                            onClick={transfer}
+                            onClick={transfer.bind(this, recipient, amount.toString())}
                         >
                         Send
                         </Button>

@@ -1,31 +1,17 @@
+import { Button, ButtonGroup, Container, Navbar } from 'react-bootstrap';
+
 import { useState, useEffect } from "react";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 
-import { Button, ButtonGroup } from "react-bootstrap";
-//need to check the network and enable switch
-const ConnectBtn = () => {
+const Nav = (props) => {
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    detectWeb3();
-  })
-  //---------check if there's web3 connection--------
-  const detectWeb3 = async () => {
-    let provider;
-    if(window.ethereum) {
-      provider = window.ethereum;
-    } else if(window.web3) {
-      provider = window.web3.currentProvider;
-    } else { 
-      console.log("Please use Metamask to login")
-    };
-    const web3 = new Web3(provider);
-    const accounts = await web3.eth.getAccounts();
-    setAccount(accounts[0]);
-    await getBalance(web3);
-  }
+    setAccount(props.account);
+    setBalance(props.balance);
+  },[props]);
 
   //------if no web3 connection, connect--------
   const getWeb3Modal = async() => {
@@ -61,18 +47,26 @@ const ConnectBtn = () => {
     const accounts = await web3.eth.getAccounts();
     setAccount(accounts[0]);
   }
-  return(
-    <div>
-      {account ?
-      <ButtonGroup size="lg" className="mb-2">
-        <Button variant="light" disabled>{balance}&nbsp;<i className="fa-brands fa-ethereum"></i></Button>
-        <Button variant="secondary">{account.slice(0,5).concat('...').concat(account.slice(-4))}</Button>
-      </ButtonGroup>
-      :
-      <Button variant="light" size="lg" onClick={connect}>Connect</Button>
-      }
-    </div>
-  )
+  return (
+    <Navbar>
+      <Container>
+      <Navbar.Collapse className="justify-content-end">
+          <Navbar.Text>
+            <div>
+              {account ?
+              <ButtonGroup size="lg" className="mb-2">
+                <Button variant="light" disabled>{balance}&nbsp;<i className="fa-brands fa-ethereum"></i></Button>
+                <Button variant="secondary">{account.slice(0,5).concat('...').concat(account.slice(-4))}</Button>
+              </ButtonGroup>
+              :
+              <Button variant="light" size="lg" onClick={connect}>Connect</Button>
+              }
+            </div>
+          </Navbar.Text>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
 }
 
-export default ConnectBtn;
+export default Nav;
