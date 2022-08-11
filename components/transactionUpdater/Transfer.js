@@ -1,23 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Row, Col, Button, Form, Card } from 'react-bootstrap';
+import Popup from "./popup";
 
 function Transfer(props) {  
     const [recipient, setRecipient] = useState("");
     const [amount, setAmount] = useState(0);
+    const [variant, setVariant] = useState("");
+    const [show, setShow] = useState(false);
+    const [message, setMessage] = useState("");
+
     const { web3, account, balance } = props;
-//two methods for transfering, one is writing a simple ABI and connect contract
-//another is writing a transaction object for transfering
-    const transfer = async (recipient, amount) => {
-        const amountInWei = await web3.utils.toWei(amount, 'ether');
-        await web3.eth.sendTransaction({
+    useEffect(() => {
+        console.log(show)
+    });
+    const transactionsubmitted = async (hash) => {
+        console.log(hash);
+        setVariant("secondary");
+        setMessage("Transaction submitted with hash ID: " + hash);
+        setShow(true);
+    }
+    const transfer = async () => {
+        const amountInWei = await web3.utils.toWei(amount.toString(), 'ether');
+        try {
+            await web3.eth.sendTransaction({
             from: account,
             to: recipient,//0xc28b02f9316E3D9c0BF7cfE14dbaBC6D67230E78
-            value: amountInWei
-        }, (err, res) => {
-            err ? console.log(err) : console.log(res);
-        });
+            value: amountInWei,
+            chainId: 4
+            })
+            .once('transactionHash', function(hash){
+                transactionsubmitted(hash);
+            })
+            // .on('receipt', async function(receipt){
+            //   if(receipt.status === false) {
+            //     await setVariant("danger");
+            //     await setMessage(receipt.status);
+            //     await setShow(true);
+            //   }
+            // })
+            // .on('confirmation', async function(confirmationNumber, receipt){ 
+            //  }).then(() => {
+            //     setVariant("secondary");
+            //     setMessage("Transaction sent");
+            //     setShow(true);
+            //     console.log("Transaction sent");
+            // })
+            
+            // .on('error', console.error); // If a out of gas e
+        } catch (err) {
+            console.log(err)
+        }
     }
+
     return (
+    <>
+    <Row className="mt-2 justify-content-end" style={{height: "5rem"}}>
+        <Popup variant={variant} changeShow={(show) => setShow(show)} message={message} />
+    </Row>
     <Row className="mt-5 justify-content-center">
         <Col xs={4}>
             <Card className="bg-light text-white">
@@ -51,21 +90,25 @@ function Transfer(props) {
                         recipient && amount && amount <= balance ?
                         <Button 
                             variant="primary" 
-                            size="lg" 
-                            type="Send" 
+                            size="lg"
                             className="mb-2" 
                             style={{width:"100%", borderRadius:'15px'}} 
-                            onClick={transfer.bind(this, recipient, amount.toString())}
-                        >
-                        Send
-                        </Button>
+                            onClick={() => transfer()}
+                        >Send</Button>
                     :
-                         <Button variant="primary" size="lg" type="Send" className="mb-2" style={{width:"100%", borderRadius:'15px'}} disabled>Insufficient balance</Button>
+                         <Button 
+                            variant="primary" 
+                            size="lg" 
+                            className="mb-2" 
+                            style={{width:"100%", borderRadius:'15px'}} 
+                            disabled
+                        >Insufficient balance</Button>
                     }
                 </Form>
             </Card>
         </Col>
     </Row>
+    </>
   );
 }
 
