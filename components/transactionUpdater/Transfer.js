@@ -10,9 +10,6 @@ function Transfer(props) {
     const [message, setMessage] = useState("");
 
     const { web3, account, balance } = props;
-    useEffect(() => {
-        console.log(show)
-    });
 
     const transactionsubmitted = async (hash) => {
         setVariant("light");

@@ -13,7 +13,7 @@ function AccountDetails(props) {
     const balanceHistory = async (web3) => {
       try {
         const blockNumber = await web3.eth.getBlockNumber();
-        console.log(blockNumber);
+        // console.log(blockNumber);
         let recordNum;
         if(blockNumber > 10000) {
             recordNum = 11;
@@ -22,7 +22,7 @@ function AccountDetails(props) {
         }
 
          for (let i = 0; i < recordNum; i++){
-                  console.log(balanceRecord)
+            // console.log(balanceRecord)
             let displayBlock = blockNumber - i * 1000;
             web3.eth.getBalance(account, displayBlock, (err, balance) => {
                 balance = parseFloat(web3.utils.fromWei(balance)).toFixed(5);
@@ -65,7 +65,7 @@ function AccountDetails(props) {
       </Modal.Body>
       <Modal.Footer className='mb-5'>
             <Container className='text-center'>
-                <h5 className='text-dark'>Your account balance history </h5>
+                <h4 className='text-dark mb-2'>Your account balance history </h4>
                 { balanceRecord.map((balance, index) => {
                   return(
                       <Row key={index}>

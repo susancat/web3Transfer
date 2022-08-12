@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import Nav from '../components/Nav'
-import Transfer from '../components/transactionUpdater/Transfer'
+// import Transfer from '../components/transactionUpdater/Transfer'
 import { useState, useEffect } from 'react'
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
@@ -10,7 +10,6 @@ export default function Home() {
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState(0);
   const [web3, setWeb3] = useState(null);
-  const [web3FromNav, setWeb3FromNav] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -20,12 +19,6 @@ export default function Home() {
         }
     })()
   }, [])
-
-  useEffect(() => {
-    (async () => {
-      await fetchAccountData(web3FromNav);
-    });
-  }, [web3FromNav])
 
   //---------check if there's web3 connection--------
   async function getWeb3Modal() {
@@ -69,9 +62,7 @@ export default function Home() {
       console.log(err)
     }
   }
-const web3Updater = () => {
-  setWeb3FromNav(web3FromNav);
-}
+
   return (
     <div className={styles.container}>
       <Head>
@@ -79,8 +70,8 @@ const web3Updater = () => {
         <meta name="description" content="web3 token check and transfer" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Nav account={account} balance={balance} updateWeb3={web3Updater} web3={web3} />
-      <Transfer account={account} balance={balance} web3={web3} />
+      <Nav account={account} balance={balance} web3={web3} />
+      {/* <Transfer account={account} balance={balance} web3={web3} /> */}
     </div>
   )
 }

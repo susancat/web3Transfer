@@ -1,5 +1,6 @@
 import { Button, ButtonGroup, Container, Navbar } from 'react-bootstrap';
 import AccountDetails from './accountDetails';
+import Transfer from './transactionUpdater/Transfer';
 import { useState, useEffect } from "react";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
@@ -9,12 +10,12 @@ const Nav = (props) => {
   const [balance, setBalance] = useState(0);
   const [web3, setWeb3] = useState(null);
   const [modalShow, setModalShow] = useState(false);
-console.log(props)
+
   useEffect(() => {
     setAccount(props.account);
     setBalance(props.balance);
     setWeb3(props.web3);
-  },[props.web3]);
+  },[props]);
   //------if no web3 connection, connect--------
   const getWeb3Modal = async() => {
     const providerOptions = {
@@ -43,7 +44,6 @@ console.log(props)
         const web3Modal = await getWeb3Modal();
         const provider = await web3Modal.connect();
         const web3 = new Web3(provider);
-        props.updateWeb3(web3);
         setWeb3(web3);
         const accounts = await web3.eth.getAccounts();
         fetchAccountData(web3);
@@ -80,6 +80,7 @@ console.log(props)
         </Navbar.Collapse>
       </Container>
     </Navbar>
+    <Transfer account={account} balance={balance} web3={web3} />
     <AccountDetails 
       web3={web3}
       account={account}
