@@ -1,15 +1,16 @@
-import { useState } from 'react';
 import { Toast } from 'react-bootstrap';
 import Image from 'next/image';
-function Popup(props) {
-    const { variant, message, changeShow } = props;
+
+const Popup = ({show, setShow, variant, message}) => {
+    const handleClose = () => setShow(false);
+
   return (
     <>
         <Toast
             className="d-inline-block m-1"
             bg={variant.toLowerCase()}
-            onClose={() => props.changeShow(false)}
-            show={changeShow} 
+            onClose={handleClose}
+            show={show}
             delay={2000}
             autohide
         >

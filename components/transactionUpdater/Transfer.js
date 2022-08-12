@@ -13,10 +13,22 @@ function Transfer(props) {
     useEffect(() => {
         console.log(show)
     });
+
     const transactionsubmitted = async (hash) => {
-        console.log(hash);
-        setVariant("secondary");
+        setVariant("light");
         setMessage("Transaction submitted with hash ID: " + hash);
+        setShow(true);
+    }
+
+    const onConfirmation = async (receipt) => {
+        setVariant("success");
+        setMessage("Transaction sent");
+        setShow(true);
+    }
+
+    const onError = async (receipt) => {
+        setVariant("danger");
+        setMessage("Transaction failed");
         setShow(true);
     }
     const transfer = async () => {
@@ -24,29 +36,22 @@ function Transfer(props) {
         try {
             await web3.eth.sendTransaction({
             from: account,
-            to: recipient,//0xc28b02f9316E3D9c0BF7cfE14dbaBC6D67230E78
+            to: recipient,
             value: amountInWei,
             chainId: 4
             })
             .once('transactionHash', function(hash){
                 transactionsubmitted(hash);
             })
-            // .on('receipt', async function(receipt){
-            //   if(receipt.status === false) {
-            //     await setVariant("danger");
-            //     await setMessage(receipt.status);
-            //     await setShow(true);
-            //   }
-            // })
-            // .on('confirmation', async function(confirmationNumber, receipt){ 
-            //  }).then(() => {
-            //     setVariant("secondary");
-            //     setMessage("Transaction sent");
-            //     setShow(true);
-            //     console.log("Transaction sent");
-            // })
-            
-            // .on('error', console.error); // If a out of gas e
+            .once('confirmation', async function(confirmationNumber, receipt){ //if use "on('"confirmation") here, it will be triggered repeatedly
+                onConfirmation(receipt);
+            })
+            .once('receipt', async function(receipt){
+              if(receipt.status === false) {
+                onError(receipt)
+              }
+            })
+            .on('error', console.error); // If a out of gas e
         } catch (err) {
             console.log(err)
         }
@@ -55,7 +60,7 @@ function Transfer(props) {
     return (
     <>
     <Row className="mt-2 justify-content-end" style={{height: "5rem"}}>
-        <Popup variant={variant} changeShow={(show) => setShow(show)} message={message} />
+        <Popup variant={variant} setShow={setShow} show={show} message={message} />
     </Row>
     <Row className="mt-5 justify-content-center">
         <Col xs={4}>

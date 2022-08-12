@@ -13,8 +13,8 @@ const Nav = (props) => {
   useEffect(() => {
     setAccount(props.account);
     setBalance(props.balance);
+    setWeb3(props.web3);
   },[props]);
-
   //------if no web3 connection, connect--------
   const getWeb3Modal = async() => {
     const providerOptions = {
@@ -29,26 +29,29 @@ const Nav = (props) => {
       return web3Modal;
   }
 
-  const getBalance = async (web3) => {
+  async function fetchAccountData(web3) { 
     const accounts = await web3.eth.getAccounts();
+    setAccount(accounts[0]);
     const balInWei = await web3.eth.getBalance(accounts[0]);
     const balance = await web3.utils.fromWei(balInWei);
     setBalance(parseFloat(balance).toFixed(5));
   }
 
   const connect = async () => {
-    const web3Modal = await getWeb3Modal();
-    const provider = await web3Modal
-    .connect()
-    .catch(error => {
-      console.log(error);
-    }
-    );
-    const web3 = new Web3(provider);
-    const accounts = await web3.eth.getAccounts();
-    setAccount(accounts[0]);
-    await getBalance(web3);
-    setWeb3(web3);
+    if(!window.ethereum) throw new Error("No crypto wallet found!");
+      try{
+        const web3Modal = await getWeb3Modal();
+        const provider = await web3Modal.connect();
+        const web3 = new Web3(provider);
+        setWeb3(web3);
+        const accounts = await web3.eth.getAccounts();
+        fetchAccountData(web3);
+        window.ethereum.on("accountsChanged", (accounts) => {
+          fetchAccountData(web3);
+       });
+      } catch(err){
+        console.log(err)
+      }
   }
   return (
     <>
@@ -76,6 +79,8 @@ const Nav = (props) => {
       </Container>
     </Navbar>
     <AccountDetails 
+      web3={web3}
+      account={account}
       show={modalShow} 
       onHide={() => setModalShow(false)} 
     />

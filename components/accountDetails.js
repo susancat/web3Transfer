@@ -1,50 +1,41 @@
 import {Button, Col, Container, Modal, Row} from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import Web3 from "web3";
+// import Web3Modal from "web3modal";
 
 function AccountDetails(props) {
     const [balanceRecord, setBalanceRecord] = useState([]);
-    const [account, setAccount] = useState(null);
+    const { web3, account } = props;
+
     useEffect(() => {
-        detectWeb3();
-      },[]);
-      //---------check if there's web3 connection--------
-      const detectWeb3 = async () => {
-        let provider;
-        if(window.ethereum) {
-          provider = window.ethereum;
-        } else if(window.web3) {
-          provider = window.web3.currentProvider;
-        } else { 
-          console.log("Please use Metamask to login")
-        };
-        try {
-          await provider.request({ method: 'eth_requestAccounts' });
-          const web3 = new Web3(provider);
-          const accounts = await web3.eth.getAccounts();
-          setAccount(accounts[0]);
-          await balanceHistory(web3);
-        } catch (err) {
-          console.log(err);
-        }
-      }
+        balanceHistory(web3);
+    },[account]);
+      
     const balanceHistory = async (web3) => {
+      try {
         const blockNumber = await web3.eth.getBlockNumber();
         console.log(blockNumber);
         let recordNum;
         if(blockNumber > 10000) {
-            recordNum = 10;
+            recordNum = 11;
         } else {
             recordNum = Math.floor(blockNumber / 1000);
         }
+
          for (let i = 0; i < recordNum; i++){
+                  console.log(balanceRecord)
             let displayBlock = blockNumber - i * 1000;
-            await web3.eth.getBalance(account, displayBlock, (err, balance) => {
+            web3.eth.getBalance(account, displayBlock, (err, balance) => {
+                balance = parseFloat(web3.utils.fromWei(balance)).toFixed(5);
                 console.log("block: " + displayBlock + " balance: " + balance);
-                const newRecord = [...balanceRecord, `${displayBlock}: ${balance}`]
-                setBalanceRecord(newRecord);
+                let value = `${displayBlock}: ${balance}`       
+                // const newRecord = [...balanceRecord, value]
+                // setBalanceRecord(newRecord);
+                balanceRecord.push(value);
             })
          }
+      } catch (err) {
+        console.log(err);
+      }
     }
 
   return (
@@ -76,13 +67,13 @@ function AccountDetails(props) {
             <Container className='text-center'>
                 <h5 className='text-dark'>Your account balance history </h5>
                 { balanceRecord.map((balance, index) => {
-                return(
-                    <Row key={index}>
-                        <Col xs={12}>
-                            <h5 className='text-dark'>{balance}</h5>
-                        </Col>
-                    </Row>
-                )
+                  return(
+                      <Row key={index}>
+                          <Col xs={12}>
+                              <h5 className='text-dark'>Block:&nbsp;{balance}&nbsp;<i className="fa-brands fa-ethereum"></i></h5>
+                          </Col>
+                      </Row>
+                  )
                 })
                 }
             </Container>
