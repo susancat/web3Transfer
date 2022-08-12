@@ -10,6 +10,7 @@ export default function Home() {
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState(0);
   const [web3, setWeb3] = useState(null);
+  const [web3FromNav, setWeb3FromNav] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -19,6 +20,12 @@ export default function Home() {
         }
     })()
   }, [])
+
+  useEffect(() => {
+    (async () => {
+      await fetchAccountData(web3FromNav);
+    });
+  }, [web3FromNav])
 
   //---------check if there's web3 connection--------
   async function getWeb3Modal() {
@@ -52,7 +59,7 @@ export default function Home() {
 
   async function fetchAccountData(web3) {
     try {
-    // const chainId = await web3.eth.getChainId();    
+    const chainId = await web3.eth.getChainId();    
     const accounts = await web3.eth.getAccounts();
     setAccount(accounts[0]);
     const balInWei = await web3.eth.getBalance(accounts[0]);
@@ -62,7 +69,9 @@ export default function Home() {
       console.log(err)
     }
   }
-
+const web3Updater = () => {
+  setWeb3FromNav(web3FromNav);
+}
   return (
     <div className={styles.container}>
       <Head>
@@ -70,7 +79,7 @@ export default function Home() {
         <meta name="description" content="web3 token check and transfer" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Nav account={account} balance={balance} web3={web3} />
+      <Nav account={account} balance={balance} updateWeb3={web3Updater} web3={web3} />
       <Transfer account={account} balance={balance} web3={web3} />
     </div>
   )
