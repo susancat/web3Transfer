@@ -19,7 +19,7 @@ function Transfer(props) {
 
     const onConfirmation = async (receipt) => {
         setVariant("success");
-        setMessage("Transaction sent");
+        setMessage("Transaction success");
         setShow(true);
     }
 

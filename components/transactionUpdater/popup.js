@@ -23,9 +23,9 @@ const Popup = ({show, setShow, variant, message}) => {
                 alt=""
             />
             <strong className="me-auto">Bootstrap</strong>
-            <small>view the transaction</small>
+            <small className='text-dark'>view the transaction</small>
             </Toast.Header>
-            <Toast.Body className={variant === 'Dark' && 'text-white'}>
+            <Toast.Body className={variant === 'Dark' && 'text-dark'}>
              {message}
             </Toast.Body>
         </Toast>

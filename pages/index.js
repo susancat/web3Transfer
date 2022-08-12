@@ -39,6 +39,10 @@ export default function Home() {
       const web3Modal = await getWeb3Modal();
       const provider = await web3Modal.connect();
       const web3 = new Web3(provider);
+      const chainId = await web3.eth.getChainId();   
+      if (chainId !== 4) {
+        switchNetwork();
+      }
       setWeb3(web3);
       const accounts = await web3.eth.getAccounts();
       fetchAccountData(web3);
@@ -50,9 +54,48 @@ export default function Home() {
     }
   }
 
+  async function switchNetwork() {
+    if (window.ethereum) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: Web3.utils.toHex(4) }], // chainId must be in hexadecimal numbers
+          })
+          .then (async() => {
+            const web3Modal = await getWeb3Modal();
+            const provider = await web3Modal.connect();
+            const web3 = new Web3(provider);
+            await fetchAccountData(web3);
+            }).catch(err => {
+              console.log(err);
+            }
+          );
+        } catch (error) {
+          if (error.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                  {
+                    chainId: '4',
+                    rpcUrl: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+                  },
+                ],
+              });
+            } catch (addError) {
+              console.error(addError);
+            }
+          }
+          console.error(error);
+        }
+      } else {
+        // if no window.ethereum then MetaMask is not installed
+        alert('MetaMask is not installed. Please consider installing it: https://metamask.io/download.html');
+      } 
+  }
+
   async function fetchAccountData(web3) {
-    try {
-    const chainId = await web3.eth.getChainId();    
+    try { 
     const accounts = await web3.eth.getAccounts();
     setAccount(accounts[0]);
     const balInWei = await web3.eth.getBalance(accounts[0]);
