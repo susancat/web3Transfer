@@ -111,7 +111,7 @@ const Nav = (props) => {
                 <Button variant="light" disabled>{balance}&nbsp;<i className="fa-brands fa-ethereum"></i></Button>
                 <Button 
                   variant="secondary"
-                  onClick={() => setModalShow(true)}
+                  onClick={() => {setModalShow(true)}}
                   >
                     {account.slice(0,5).concat('...').concat(account.slice(-4))}
                   </Button>
@@ -126,7 +126,6 @@ const Nav = (props) => {
     </Navbar>
     <Transfer account={account} balance={balance} web3={web3} />
     <AccountDetails 
-      web3={web3}
       account={account}
       show={modalShow} 
       onHide={() => setModalShow(false)} 
