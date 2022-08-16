@@ -48,7 +48,7 @@ export default function AccountDetails(props) {
                   return(
                       <Row key={index}>
                           <Col xs={12}>
-                              <h5 className='text-dark'>Block:&nbsp;{balance}&nbsp;<i className="fa-brands fa-ethereum"></i></h5>
+                              <h5 className='text-dark'>Block&nbsp;{balance}&nbsp;<i className="fa-brands fa-ethereum"></i></h5>
                           </Col>
                       </Row>
                   )

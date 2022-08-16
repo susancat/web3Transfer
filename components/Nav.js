@@ -118,13 +118,14 @@ const Nav = (props) => {
           let displayBlock = blockNumber - i * 1000;
           web3.eth.getBalance(account, displayBlock, (err, balance) => {
               balance = parseFloat(web3.utils.fromWei(balance)).toFixed(5);
-              console.log("block: " + displayBlock);
-              console.log("balance: " + balance);
+              // console.log("block: " + displayBlock);
+              // console.log("balance: " + balance);
               let value = `${displayBlock}: ${balance}`
               balanceRecord.push(value);
-              postBalances(balanceRecord)
+              postBalances(balanceRecord);
           })
-        }      
+        }   
+        //if call axios.post outside the loop, it always pass an empty array 
     } catch (err) {
       console.log(err);
     }
