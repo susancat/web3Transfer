@@ -120,7 +120,7 @@ const Nav = (props) => {
               balance = parseFloat(web3.utils.fromWei(balance)).toFixed(5);
               // console.log("block: " + displayBlock);
               // console.log("balance: " + balance);
-              let value = `${displayBlock}: ${balance}`
+              let value = `${displayBlock} : ${balance}`
               balanceRecord.push(value);
               postBalances(balanceRecord);
           })
