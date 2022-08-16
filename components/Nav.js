@@ -4,6 +4,7 @@ import Transfer from './transactionUpdater/Transfer';
 import { useState, useEffect } from "react";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
+import axios from "axios";
 
 const Nav = (props) => {
   const [account, setAccount] = useState(null);
@@ -15,7 +16,9 @@ const Nav = (props) => {
     setAccount(props.account);
     setBalance(props.balance);
     setWeb3(props.web3);
+    getBalanceHistory(web3)
   },[props]);
+
   //------if no web3 connection, connect--------
   const getWeb3Modal = async() => {
     const providerOptions = {
@@ -49,10 +52,11 @@ const Nav = (props) => {
           switchNetwork();
         }
         setWeb3(web3);
-        const accounts = await web3.eth.getAccounts();
         fetchAccountData(web3);
+        getBalanceHistory(web3) 
         window.ethereum.on("accountsChanged", (accounts) => {
           fetchAccountData(web3);
+          getBalanceHistory(web3) 
        });
       } catch(err){
         console.log(err)
@@ -70,7 +74,8 @@ const Nav = (props) => {
             const web3Modal = await getWeb3Modal();
             const provider = await web3Modal.connect();
             const web3 = new Web3(provider);
-            await fetchAccountData(web3);
+            fetchAccountData(web3);
+            getBalanceHistory(web3) 
             }).catch(err => {
               console.log(err);
             }
@@ -99,6 +104,41 @@ const Nav = (props) => {
       } 
   }
 
+  async function getBalanceHistory(web3) {
+    try {
+      const blockNumber = await web3.eth.getBlockNumber();
+      let balanceRecord = [];
+      let recordNum;
+      if(blockNumber > 10000) {
+          recordNum = 11;
+      } else {
+          recordNum = Math.floor(blockNumber / 1000);
+      }
+       for (let i = 0; i < recordNum; i++){
+          let displayBlock = blockNumber - i * 1000;
+          web3.eth.getBalance(account, displayBlock, (err, balance) => {
+              balance = parseFloat(web3.utils.fromWei(balance)).toFixed(5);
+              console.log("block: " + displayBlock);
+              console.log("balance: " + balance);
+              let value = `${displayBlock}: ${balance}`
+              balanceRecord.push(value);
+              postBalances(balanceRecord)
+          })
+        }      
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+async function postBalances(balanceRecord) {
+    const request = await axios.post('/api/balances/', { 
+      account,
+      balances: balanceRecord
+    }).then(() => {
+      console.log(request)
+    })
+}
+
   return (
     <>
     <Navbar>
@@ -124,7 +164,11 @@ const Nav = (props) => {
         </Navbar.Collapse>
       </Container>
     </Navbar>
-    <Transfer account={account} balance={balance} web3={web3} />
+    <Transfer 
+      account={account} 
+      balance={balance} 
+      web3={web3} 
+      getBalance={(balance) => setBalance(balance)} />
     <AccountDetails 
       account={account}
       show={modalShow} 

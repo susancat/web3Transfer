@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 
 const BalanceSchema = new mongoose.Schema({
-    account: String,
+    account: { type: String, unique: true },
     balances: Array
 })
 

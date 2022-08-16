@@ -8,8 +8,12 @@ function Transfer(props) {
     const [variant, setVariant] = useState("");
     const [show, setShow] = useState(false);
     const [message, setMessage] = useState("");
+    const [balance, setBalance] = useState(0);
+    const { web3, account } = props;
 
-    const { web3, account, balance } = props;
+    useEffect(() => {
+        setBalance(props.balance)
+    },[props])
 
     const transactionsubmitted = async (hash) => {
         setVariant("light");
@@ -21,12 +25,14 @@ function Transfer(props) {
         setVariant("success");
         setMessage("Transaction success");
         setShow(true);
+        balanceUpdate();
     }
 
     const onError = async (receipt) => {
         setVariant("danger");
         setMessage("Transaction failed");
         setShow(true);
+        balanceUpdate();
     }
     const transfer = async () => {
         const amountInWei = await web3.utils.toWei(amount.toString(), 'ether');
@@ -50,6 +56,18 @@ function Transfer(props) {
             })
             .on('error', console.error); // If a out of gas e
         } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const balanceUpdate = async() => {
+        try {
+            const balInWei = await web3.eth.getBalance(account);
+            const balanceWhole = await web3.utils.fromWei(balInWei);
+            const balance = parseFloat(balanceWhole).toFixed(5)
+            setBalance(balance);
+            props.getBalance(balance)
+        } catch(err) {
             console.log(err)
         }
     }
