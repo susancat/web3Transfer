@@ -123,13 +123,13 @@ const Nav = (props) => {
               // postBalances(balanceRecord);
           })
         }   
-       return  balanceRecord;
+       return balanceRecord;
     } catch (err) {
       console.log(err);
     }
   }
 
-async function postBalances(web) {
+async function postBalances(web3) {
     const balanceRecord= await getBalanceHistory(web3);
     const request = await axios.post('/api/balances/', { 
       account,
