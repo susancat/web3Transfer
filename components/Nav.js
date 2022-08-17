@@ -16,7 +16,7 @@ const Nav = (props) => {
     setAccount(props.account);
     setBalance(props.balance);
     setWeb3(props.web3);
-    getBalanceHistory(web3)
+    postBalances(props.web3);
   },[props]);
 
   //------if no web3 connection, connect--------
@@ -53,10 +53,10 @@ const Nav = (props) => {
         }
         setWeb3(web3);
         fetchAccountData(web3);
-        getBalanceHistory(web3) 
+        postBalances(web3);
         window.ethereum.on("accountsChanged", (accounts) => {
           fetchAccountData(web3);
-          getBalanceHistory(web3) 
+          postBalances(web3);
        });
       } catch(err){
         console.log(err)
@@ -75,7 +75,7 @@ const Nav = (props) => {
             const provider = await web3Modal.connect();
             const web3 = new Web3(provider);
             fetchAccountData(web3);
-            getBalanceHistory(web3) 
+            postBalances(web3);
             }).catch(err => {
               console.log(err);
             }
@@ -107,7 +107,7 @@ const Nav = (props) => {
   async function getBalanceHistory(web3) {
     try {
       const blockNumber = await web3.eth.getBlockNumber();
-      let balanceRecord = [];
+      let balanceRecord = new Array(0);
       let recordNum;
       if(blockNumber > 10000) {
           recordNum = 11;
@@ -116,22 +116,21 @@ const Nav = (props) => {
       }
        for (let i = 0; i < recordNum; i++){
           let displayBlock = blockNumber - i * 1000;
-          web3.eth.getBalance(account, displayBlock, (err, balance) => {
+          await web3.eth.getBalance(account, displayBlock, async(err, balance) => {
               balance = parseFloat(web3.utils.fromWei(balance)).toFixed(5);
-              // console.log("block: " + displayBlock);
-              // console.log("balance: " + balance);
               let value = `${displayBlock} : ${balance}`
               balanceRecord.push(value);
-              postBalances(balanceRecord);
+              // postBalances(balanceRecord);
           })
         }   
-        //if call axios.post outside the loop, it always pass an empty array 
+       return  balanceRecord;
     } catch (err) {
       console.log(err);
     }
   }
 
-async function postBalances(balanceRecord) {
+async function postBalances(web) {
+    const balanceRecord= await getBalanceHistory(web3);
     const request = await axios.post('/api/balances/', { 
       account,
       balances: balanceRecord

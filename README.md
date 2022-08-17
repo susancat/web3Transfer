@@ -17,4 +17,3 @@ A token transfer tool based on:
 
 ## bugs report
 - after connect the wallet, the balance history would be uploaded to mongoDB automatically, but connecting the DB and uploading takes time so sometimes when click the wallet address button at Nav bar, the history doesn't show;
-- sometimes the history records are less than 11 pieces
